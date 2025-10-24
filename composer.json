@@ -25,6 +25,9 @@
     "mockery/mockery": "*"
   },
   "autoload": {
+    "files": [
+      "src/helper.php"
+    ],
     "psr-4": {
       "Wget\\": "src/"
     }
