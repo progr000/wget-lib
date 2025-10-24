@@ -1,0 +1,38 @@
+{
+  "name": "maksym/wget",
+  "type": "library",
+  "description": "Wget-package for small framework",
+  "keywords": [
+    "wget",
+    "curl"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Maksym Haivoronskyi",
+      "email": "maksym.haivoronskyi@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-curl": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "@stable",
+    "mockery/mockery": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wget\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
