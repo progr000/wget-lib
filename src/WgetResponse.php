@@ -149,6 +149,6 @@ class WgetResponse
     public function cookies()
     {
         /** TODO */
-        return [];
+        return array();
     }
 }

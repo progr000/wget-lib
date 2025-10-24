@@ -7,9 +7,9 @@ class WgetDriver
     /** @var int */
     private static $instancesCount = 0;
     /** @var string[] */
-    private static $allowed_methods = ['GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE'];
+    private static $allowed_methods = array('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE');
     /** @var array */
-    private $send_headers = [];
+    private $send_headers = array();
     /** @var bool */
     private $flagAsJson = false;
 
@@ -46,7 +46,7 @@ class WgetDriver
         curl_setopt($instance->curl, CURLOPT_VERBOSE, true);
         curl_setopt($instance->curl, CURLOPT_HEADER, true);
         curl_setopt($instance->curl,CURLOPT_ENCODING , "gzip");  // TODO: discover this
-        if ((function_exists('config') && config('IGNORE_SSL_ERRORS', false)) || defined('IGNORE_SSL_ERRORS')) {
+        if ((function_exists('config') && config('IGNORE_SSL_ERRORS', false)) ||  defined('IGNORE_SSL_ERRORS')) {
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, 0);
         }
@@ -61,9 +61,9 @@ class WgetDriver
      * @param array $additional_headers
      * @return $this
      */
-    public function setBearerAutorisation($bearerHash, array $additional_headers=[])
+    public function setBearerAutorisation($bearerHash, array $additional_headers=array())
     {
-        $this->setHeaders(["Authorization: Bearer $bearerHash"]);
+        $this->setHeaders(array("Authorization: Bearer $bearerHash"));
         $this->setHeaders($additional_headers);
         return $this;
     }
@@ -75,7 +75,7 @@ class WgetDriver
     public function asJson()
     {
         $this->flagAsJson = true;
-        $this->setHeaders(['Content-Type: application/json']);
+        $this->setHeaders(array('Content-Type: application/json'));
         return $this;
     }
 
@@ -106,7 +106,7 @@ class WgetDriver
     private function setData($data)
     {
         if (empty($data)) {
-            $data = [];
+            $data = array();
         }
         if ($this->flagAsJson) {
             $data = json_encode($data);
@@ -121,7 +121,7 @@ class WgetDriver
      */
     public function setHeaders(array $headers)
     {
-        $prepared_headers = [];
+        $prepared_headers = array();
         foreach ($headers as $k => $v) {
             if (gettype($k) === 'string') {
                 $prepared_headers[] = "{$k}: {$v}";
