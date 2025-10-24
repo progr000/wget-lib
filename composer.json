@@ -1,9 +1,10 @@
 {
-  "name": "maksym/wget",
+  "name": "maksym/wget-lib",
   "type": "library",
   "description": "Wget-package for small framework",
   "keywords": [
     "wget",
+    "lib",
     "curl"
   ],
   "license": "MIT",
