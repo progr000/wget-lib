@@ -46,7 +46,7 @@ class WgetDriver
         curl_setopt($instance->curl, CURLOPT_VERBOSE, true);
         curl_setopt($instance->curl, CURLOPT_HEADER, true);
         curl_setopt($instance->curl,CURLOPT_ENCODING , "gzip");  // TODO: discover this
-        if ((function_exists('config') && config('IGNORE_SSL_ERRORS', false)) ||  defined('IGNORE_SSL_ERRORS')) {
+        if ((function_exists('config') && config('IGNORE_SSL_ERRORS', false)) || defined('IGNORE_CURL_SSL_ERRORS')) {
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, 0);
         }
