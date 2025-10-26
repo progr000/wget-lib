@@ -39,23 +39,24 @@ class WgetDriver
      * @return WgetDriver
      * @throws ConfigException
      */
-    public static function init()
+    public static function init($curl_setopt = array())
     {
         $instance = new self();
         $instance->curl = curl_init();
         //curl_reset($instance->curl);
-        curl_setopt($instance->curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($instance->curl, CURLINFO_HEADER_OUT, true);
-        curl_setopt($instance->curl, CURLOPT_VERBOSE, true);
-        curl_setopt($instance->curl, CURLOPT_HEADER, true);
-        curl_setopt($instance->curl,CURLOPT_ENCODING , "gzip");  // TODO: discover this
-        if (config('IGNORE_SSL_ERRORS', false)) {
-            curl_setopt($instance->curl, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt_array($instance->curl, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLINFO_HEADER_OUT => true,
+            CURLOPT_VERBOSE => true,
+            CURLOPT_HEADER => true,
+            CURLOPT_ENCODING => "gzip", // TODO: discover this
+            CURLOPT_FRESH_CONNECT => true,
+            CURLOPT_SSL_VERIFYHOST => !config('IGNORE_SSL_ERRORS', false),
+            CURLOPT_SSL_VERIFYPEER => !config('IGNORE_SSL_ERRORS', false),
+        ));
+        if (sizeof($curl_setopt)) {
+            curl_setopt_array($instance->curl, $curl_setopt);
         }
-        //curl_setopt($instance->curl, CURLOPT_FOLLOWLOCATION, false);
-        curl_setopt($instance->curl, CURLOPT_FRESH_CONNECT, true);
-        (stripos(PHP_OS, 'win') !== false) && curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, false); // fucking windows for repair https://www.saotn.org/dont-turn-off-curlopt_ssl_verifypeer-fix-php-configuration/
         return $instance;
     }
 
