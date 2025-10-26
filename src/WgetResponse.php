@@ -1,6 +1,6 @@
 <?php
 
-namespace Wget;
+namespace Maksym\Wget;
 
 use Exception;
 

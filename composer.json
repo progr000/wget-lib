@@ -21,15 +21,14 @@
     "ext-curl": "*"
   },
   "require-dev": {
-    "phpunit/phpunit": "@stable",
-    "mockery/mockery": "*"
+    "phpunit/phpunit": "@stable"
   },
   "autoload": {
     "files": [
       "src/helper.php"
     ],
     "psr-4": {
-      "Wget\\": "src/"
+      "Maksym\\Wget\\": "src/"
     }
   },
   "autoload-dev": {
