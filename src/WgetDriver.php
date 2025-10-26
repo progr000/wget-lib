@@ -51,8 +51,8 @@ class WgetDriver
             CURLOPT_HEADER => true,
             CURLOPT_ENCODING => "gzip", // TODO: discover this
             CURLOPT_FRESH_CONNECT => true,
-            CURLOPT_SSL_VERIFYHOST => !config('IGNORE_SSL_ERRORS', false),
-            CURLOPT_SSL_VERIFYPEER => !config('IGNORE_SSL_ERRORS', false),
+            CURLOPT_SSL_VERIFYHOST => config('IGNORE_SSL_ERRORS', false) ? 0 : 2,
+            CURLOPT_SSL_VERIFYPEER => config('IGNORE_SSL_ERRORS', false) ? 0 : 1,
         ));
         if (sizeof($curl_setopt)) {
             curl_setopt_array($instance->curl, $curl_setopt);
