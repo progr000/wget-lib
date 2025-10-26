@@ -2,6 +2,8 @@
 
 namespace Maksym\Wget;
 
+use Maksym\Config\ConfigException;
+
 class WgetDriver
 {
     /** @var int */
@@ -35,6 +37,7 @@ class WgetDriver
     /**
      * Create new instance
      * @return WgetDriver
+     * @throws ConfigException
      */
     public static function init()
     {
@@ -46,7 +49,7 @@ class WgetDriver
         curl_setopt($instance->curl, CURLOPT_VERBOSE, true);
         curl_setopt($instance->curl, CURLOPT_HEADER, true);
         curl_setopt($instance->curl,CURLOPT_ENCODING , "gzip");  // TODO: discover this
-        if ((function_exists('config') && config('IGNORE_SSL_ERRORS', false)) || defined('IGNORE_CURL_SSL_ERRORS')) {
+        if (config('IGNORE_SSL_ERRORS', false)) {
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($instance->curl, CURLOPT_SSL_VERIFYPEER, 0);
         }
