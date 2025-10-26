@@ -162,16 +162,16 @@ class WgetDriver
     public function get($url, $get_data = null, $body_data = null)
     {
         if (!is_null($get_data)) {
+            $str = "";
             $url = trim(trim($url, '?'), '&');
             if (is_string($get_data)) {
                 $str = trim(trim($get_data, '?'), '&');
             } elseif (is_array($get_data)) {
-                $str = "";
                 foreach ($get_data as $k => $v) {
                     if (!is_array($v) && !is_object($v)) {
                         $str .= $k . '=' . urlencode($v) . '&';
                     } elseif (is_array($v)) {
-                        foreach ($v as $k2 => $v2) {
+                        foreach ($v as $v2) {
                             $str .= $k . '=' . urlencode($v2) . '&';
                         }
                     }
