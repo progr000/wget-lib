@@ -33,7 +33,7 @@ class WgetDriver
     }
 
     /**
-     * Create new instance
+     * @param array $curl_setopt
      * @return WgetDriver
      */
     public static function init($curl_setopt = array())
