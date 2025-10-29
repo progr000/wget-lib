@@ -12,6 +12,8 @@ class WgetDriver
     private $send_headers = array();
     /** @var bool */
     private $flagAsJson = false;
+    /** @var bool */
+    private $flagAsXWwwForm = false;
 
     /** @var */
     private $curl;
@@ -76,9 +78,19 @@ class WgetDriver
     public function asJson()
     {
         $this->flagAsJson = true;
-        $this->setHeaders(array('Content-Type: application/json'));
+        $this->flagAsXWwwForm = false;
+        $this->setHeaders(array("Content-Type: application/json"));
         return $this;
     }
+
+    public function asXWwwFormUrlencoded()
+    {
+        $this->flagAsJson = false;
+        $this->flagAsXWwwForm = true;
+        $this->setHeaders(array("Content-Type: application/x-www-form-urlencoded"));
+        return $this;
+    }
+
 
     /**
      * @param string $url
@@ -111,6 +123,8 @@ class WgetDriver
         }
         if ($this->flagAsJson) {
             $data = json_encode($data);
+        } elseif ($this->flagAsXWwwForm) {
+            $data = http_build_query($data);
         }
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
         return $this;
