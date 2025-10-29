@@ -10,10 +10,9 @@ class WgetDriver
     private static $allowed_methods = array('GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'DELETE');
     /** @var array */
     private $send_headers = array();
+    /** @var string */
+    private $flagAs = "x-www-form-urlencoded";
     /** @var bool */
-    private $flagAsJson = false;
-    /** @var bool */
-    private $flagAsXWwwForm = false;
 
     /** @var */
     private $curl;
@@ -72,25 +71,24 @@ class WgetDriver
     }
 
     /**
-     * Set headers that request is json
+     * Send post request as json
      * @return $this
      */
     public function asJson()
     {
-        $this->flagAsJson = true;
-        $this->flagAsXWwwForm = false;
-        $this->setHeaders(array("Content-Type: application/json"));
+        $this->flagAs = "json";
         return $this;
     }
 
+    /**
+     * Send post request as form
+     * @return $this
+     */
     public function asXWwwFormUrlencoded()
     {
-        $this->flagAsJson = false;
-        $this->flagAsXWwwForm = true;
-        $this->setHeaders(array("Content-Type: application/x-www-form-urlencoded"));
+        $this->flagAs = "x-www-form-urlencoded";
         return $this;
     }
-
 
     /**
      * @param string $url
@@ -113,19 +111,26 @@ class WgetDriver
     }
 
     /**
-     * @param array|string|null $data
+     * @param array|object|string|null $data
      * @return $this
      */
     private function setData($data)
     {
         if (empty($data)) {
-            $data = array();
+            $data = new \stdClass();
         }
-        if ($this->flagAsJson) {
-            $data = json_encode($data);
-        } elseif ($this->flagAsXWwwForm) {
-            $data = http_build_query($data);
+        if ($this->flagAs == "json") {
+            $this->setHeaders(array("Content-Type: application/json"));
+            if (!is_string($data)) {
+                $data = json_encode($data);
+            }
+        } else {
+            $this->setHeaders(array("Content-Type: application/x-www-form-urlencoded"));
+            if (!is_string($data)) {
+                $data = http_build_query($data);
+            }
         }
+
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
         return $this;
     }
@@ -209,7 +214,7 @@ class WgetDriver
 
     /**
      * @param string $url
-     * @param array|string|null $data
+     * @param array|object|string|null $data
      * @return WgetResponse
      */
     public function post($url, $data = null)
@@ -223,7 +228,7 @@ class WgetDriver
 
     /**
      * @param string $url
-     * @param array|string|null $data
+     * @param array|object|string|null $data
      * @return WgetResponse
      */
     public function put($url, $data = null)
@@ -237,7 +242,7 @@ class WgetDriver
 
     /**
      * @param string $url
-     * @param array|string|null $data
+     * @param array|object|string|null $data
      * @return WgetResponse
      */
     public function patch($url, $data = null)
@@ -251,7 +256,7 @@ class WgetDriver
 
     /**
      * @param string $url
-     * @param array|string|null $data
+     * @param array|object|string|null $data
      * @return WgetResponse
      */
     public function delete($url, $data = null)
