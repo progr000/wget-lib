@@ -63,7 +63,7 @@ class WgetDriver
      * @param array $additional_headers
      * @return $this
      */
-    public function setBearerAutorisation($bearerHash, array $additional_headers=array())
+    public function setBearerAutorisation($bearerHash, array $additional_headers = array())
     {
         $this->setHeaders(array("Authorization: Bearer $bearerHash"));
         $this->setHeaders($additional_headers);
@@ -76,7 +76,19 @@ class WgetDriver
      */
     public function asJson()
     {
+        $this->setHeaders(array("Content-Type: application/json"));
         $this->flagAs = "json";
+        return $this;
+    }
+
+    /**
+     * Send post request as xml
+     * @return $this
+     */
+    public function asXml()
+    {
+        $this->setHeaders(array("Content-Type: application/xml"));
+        $this->flagAs = "xml";
         return $this;
     }
 
@@ -86,7 +98,19 @@ class WgetDriver
      */
     public function asXWwwFormUrlencoded()
     {
+        $this->setHeaders(array("Content-Type: application/x-www-form-urlencoded"));
         $this->flagAs = "x-www-form-urlencoded";
+        return $this;
+    }
+
+    /**
+     * Send post request as multipart/form-data
+     * @return $this
+     */
+    public function asMultipartForm()
+    {
+        $this->setHeaders(array("Content-Type: multipart/form-data"));
+        $this->flagAs = "multipart-form-data";
         return $this;
     }
 
@@ -117,17 +141,17 @@ class WgetDriver
     private function setData($data)
     {
         if (empty($data)) {
-            $data = new \stdClass();
+            return $this;
         }
-        if ($this->flagAs == "json") {
-            $this->setHeaders(array("Content-Type: application/json"));
-            if (!is_string($data)) {
-                $data = json_encode($data);
-            }
-        } else {
-            $this->setHeaders(array("Content-Type: application/x-www-form-urlencoded"));
-            if (!is_string($data)) {
-                $data = http_build_query($data);
+
+        if (!is_string($data)) {
+            switch ($this->flagAs) {
+                case "json":
+                    $data = json_encode($data);
+                    break;
+                case "x-www-form-urlencoded":
+                    $data = http_build_query($data);
+                    break;
             }
         }
 
