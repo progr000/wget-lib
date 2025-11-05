@@ -27,8 +27,9 @@ class WgetResponse
      * Constructor
      * execute curl and prepare response
      * @param $curl_resource
+     * @param WgetDriver|null $wgetDriver
      */
-    public function __construct($curl_resource)
+    public function __construct($curl_resource, $wgetDriver=null)
     {
         try {
             $response = curl_exec($curl_resource);
@@ -44,6 +45,11 @@ class WgetResponse
             $header_size = curl_getinfo($curl_resource, CURLINFO_HEADER_SIZE);
             $this->response_headers = mb_substr($response, 0, $header_size);
             $this->body = mb_substr($response, $header_size);
+            if (is_object($wgetDriver)) {
+                $wgetDriver->reset();
+            } else {
+                //curl_close($curl_resource);
+            }
         } catch (Exception $e) {
             $this->errors[] = $e->getMessage();
         }

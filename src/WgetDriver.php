@@ -12,10 +12,21 @@ class WgetDriver
     private $send_headers = array();
     /** @var string */
     private $flagAs = "x-www-form-urlencoded";
-    /** @var bool */
 
-    /** @var */
+    /** @var \CurlHandle|false|resource */
     private $curl;
+    /** @var array  */
+    private static $curl_init_sys_options = array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLINFO_HEADER_OUT => true,
+        CURLOPT_VERBOSE => true,
+        CURLOPT_HEADER => true,
+        CURLOPT_FRESH_CONNECT => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_SSL_VERIFYPEER => 1,
+        CURLOPT_ENCODING => "gzip", // TODO: discover this
+    );
+    private $curl_init_user_options = array();
 
     /**
      * Constructor
@@ -42,20 +53,26 @@ class WgetDriver
         $instance = new self();
         $instance->curl = curl_init();
         //curl_reset($instance->curl);
-        curl_setopt_array($instance->curl, array(
-            CURLOPT_RETURNTRANSFER => true,
-            CURLINFO_HEADER_OUT => true,
-            CURLOPT_VERBOSE => true,
-            CURLOPT_HEADER => true,
-            CURLOPT_FRESH_CONNECT => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_SSL_VERIFYPEER => 1,
-            CURLOPT_ENCODING => "gzip", // TODO: discover this
-        ));
-        if (sizeof($curl_setopt)) {
-            curl_setopt_array($instance->curl, $curl_setopt);
-        }
+        $instance->curl_init_user_options = array_replace(
+            self::$curl_init_sys_options,
+            $curl_setopt
+        );
+        curl_setopt_array($instance->curl, $instance->curl_init_user_options);
         return $instance;
+    }
+
+    /**
+     * @return $this
+     */
+    public function reset()
+    {
+        //curl_reset($this->curl);
+        curl_close($this->curl);
+        $this->curl = curl_init();
+        $this->send_headers = array();
+        $this->flagAs = "x-www-form-urlencoded";
+        curl_setopt_array($this->curl, $this->curl_init_user_options);
+        return $this;
     }
 
     /**
@@ -194,7 +211,7 @@ class WgetDriver
     private function exec()
     {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->send_headers);
-        return new WgetResponse($this->curl);
+        return new WgetResponse($this->curl, $this);
     }
 
     /**
