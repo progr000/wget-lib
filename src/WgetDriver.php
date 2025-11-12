@@ -182,15 +182,24 @@ class WgetDriver
      */
     public function setHeaders(array $headers)
     {
-        $prepared_headers = array();
-        foreach ($headers as $k => $v) {
-            if (gettype($k) === 'string') {
-                $prepared_headers[] = "{$k}: {$v}";
+        foreach ($headers as $key => $value) {
+            if (gettype($key) === 'string') {
+                $header_name = trim($key);
+                $header_value = trim($value);
+                $unique_header_name = mb_strtolower($header_name);
             } else {
-                $prepared_headers[] = $v;
+                $tmp = explode(":", $value);
+                if (isset($tmp[0], $tmp[1])) {
+                    $header_name = trim($tmp[0]);
+                    $header_value = trim($tmp[1]);
+                    $unique_header_name = mb_strtolower($header_name);
+                }
+            }
+            if (isset($unique_header_name, $header_name, $header_value)) {
+                $this->send_headers[$unique_header_name] = "{$header_name}: {$header_value}";
             }
         }
-        $this->send_headers = array_merge($this->send_headers, $prepared_headers);
+
         return $this;
     }
 
