@@ -13,7 +13,7 @@ class WgetDriver
     /** @var string */
     private $flagAs = "x-www-form-urlencoded";
 
-    /** @var \CurlHandle|false|resource */
+    /** @var resource|false */
     private $curl;
     /** @var array  */
     private static $curl_init_sys_options = array(
@@ -45,6 +45,14 @@ class WgetDriver
     }
 
     /**
+     * @return resource|false
+     */
+    public function getCurlResource()
+    {
+        return $this->curl;
+    }
+
+    /**
      * @param array $curl_setopt
      * @return WgetDriver
      */
@@ -72,6 +80,33 @@ class WgetDriver
         $this->send_headers = array();
         $this->flagAs = "x-www-form-urlencoded";
         curl_setopt_array($this->curl, $this->curl_init_user_options);
+        return $this;
+    }
+
+    /**
+     * @param array $headers
+     * @return $this
+     */
+    public function setHeaders(array $headers)
+    {
+        foreach ($headers as $key => $value) {
+            if (gettype($key) === 'string') {
+                $header_name = trim($key);
+                $header_value = trim($value);
+                $unique_header_name = mb_strtolower($header_name);
+            } else {
+                $tmp = explode(":", $value);
+                if (isset($tmp[0], $tmp[1])) {
+                    $header_name = trim($tmp[0]);
+                    $header_value = trim($tmp[1]);
+                    $unique_header_name = mb_strtolower($header_name);
+                }
+            }
+            if (isset($unique_header_name, $header_name, $header_value)) {
+                $this->send_headers[$unique_header_name] = "{$header_name}: {$header_value}";
+            }
+        }
+
         return $this;
     }
 
@@ -132,6 +167,46 @@ class WgetDriver
     }
 
     /**
+     * @param string $type
+     * @return $this
+     */
+    public function setContentType($type = "text/html")
+    {
+        $this->setHeaders(array("Content-Type: {$type}"));
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setAccept($type = "*/*")
+    {
+        $this->setHeaders(array("Accept: {$type}"));
+        return $this;
+    }
+
+    /**
+     * @param string $encoding
+     * @return $this
+     */
+    public function setAcceptEncoding($encoding = "gzip, deflate, br, zstd")
+    {
+        $this->setHeaders(array("Accept-Encoding: {$encoding}"));
+        return $this;
+    }
+
+    /**
+     * @param int $port
+     * @return $this
+     */
+    public function setPort($port)
+    {
+        curl_setopt($this->curl, CURLOPT_PORT, $port);
+        return $this;
+    }
+
+    /**
      * @param string $url
      * @return $this
      */
@@ -177,50 +252,13 @@ class WgetDriver
     }
 
     /**
-     * @param array $headers
-     * @return $this
-     */
-    public function setHeaders(array $headers)
-    {
-        foreach ($headers as $key => $value) {
-            if (gettype($key) === 'string') {
-                $header_name = trim($key);
-                $header_value = trim($value);
-                $unique_header_name = mb_strtolower($header_name);
-            } else {
-                $tmp = explode(":", $value);
-                if (isset($tmp[0], $tmp[1])) {
-                    $header_name = trim($tmp[0]);
-                    $header_value = trim($tmp[1]);
-                    $unique_header_name = mb_strtolower($header_name);
-                }
-            }
-            if (isset($unique_header_name, $header_name, $header_value)) {
-                $this->send_headers[$unique_header_name] = "{$header_name}: {$header_value}";
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int $port
-     * @return $this
-     */
-    public function setPort($port)
-    {
-        curl_setopt($this->curl, CURLOPT_PORT, $port);
-        return $this;
-    }
-
-    /**
      * Execute curl and process response
      * @return WgetResponse
      */
     private function exec()
     {
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->send_headers);
-        return new WgetResponse($this->curl, $this);
+        return new WgetResponse($this);
     }
 
     /**
